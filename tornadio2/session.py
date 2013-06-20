@@ -21,7 +21,10 @@
     Active TornadIO2 connection session.
 """
 
-import urlparse
+try:
+    from urlparse import urlparse  # Python 2
+except ImportError:
+    from urllib.parse import urlparse  # Python 3
 import logging
 
 
@@ -289,7 +292,7 @@ class Session(sessioncontainer.SessionBase):
         `url`
             socket.io endpoint URL.
         """
-        urldata = urlparse.urlparse(url)
+        urldata = urlparse(url)
 
         endpoint = urldata.path
 
@@ -404,7 +407,7 @@ class Session(sessioncontainer.SessionBase):
                 # in args
                 if len(args) == 1 and isinstance(args[0], dict):
                     # Fix for the http://bugs.python.org/issue4978 for older Python versions
-                    str_args = dict((str(x), y) for x, y in args[0].iteritems())
+                    str_args = dict((str(x), y) for x, y in args[0].items())
 
                     ack_response = conn.on_event(event['name'], kwargs=str_args)
                 else:
@@ -429,7 +432,7 @@ class Session(sessioncontainer.SessionBase):
                 logger.error('Incoming error: %s' % msg_data)
             elif msg_type == proto.NOOP:
                 pass
-        except Exception, ex:
+        except Exception as ex:
             logger.exception(ex)
 
             # TODO: Add global exception callback?

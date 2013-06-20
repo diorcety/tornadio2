@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from os import path as op
 
 import datetime
@@ -24,7 +26,7 @@ class SocketIOHandler(web.RequestHandler):
 class PingConnection(SocketConnection):
     @event
     def ping(self, client, text):
-        print 'Got %s from client' % text
+        print('Got %s from client' % text)
 
         now = datetime.datetime.now()
 

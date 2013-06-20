@@ -21,6 +21,7 @@
     Socket.IO protocol related functions
 """
 import logging
+import sys
 
 
 logger = logging.getLogger('tornadio2.proto')
@@ -39,6 +40,14 @@ except ImportError:
                 return float(o)
             return super(DecimalEncoder, self).default(o)
     json_decimal_args = {"cls": DecimalEncoder}
+
+
+if sys.version_info[0] == 2:
+    text_type = unicode
+    string_types = (str, unicode)
+else:
+    text_type = str
+    string_types = (str,)
 
 # Packet ids
 DISCONNECT = '0'
@@ -106,7 +115,7 @@ def message(endpoint, msg, message_id=None, force_json=False):
                    'message_id': message_id or u''}
 
     # Trying to send a dict over the wire ?
-    if not isinstance(msg, (unicode, str)) and isinstance(msg, (dict, object)):
+    if not isinstance(msg, string_types) and isinstance(msg, (dict, object)):
         packed_data.update({'kind': JSON,
                             'msg': json.dumps(msg, **json_decimal_args)})
 
@@ -114,7 +123,7 @@ def message(endpoint, msg, message_id=None, force_json=False):
     # and respect forced JSON if requested
     else:
         packed_data.update({'kind': MESSAGE if not force_json else JSON,
-                            'msg': msg if isinstance(msg, unicode) else str(msg).decode('utf-8')})
+                            'msg': msg if isinstance(msg, text_type) else str(msg).decode('utf-8')})
 
     return packed_message_tpl % packed_data
 
@@ -224,7 +233,7 @@ def decode_frames(data):
 
     """
     # Single message - nothing to decode here
-    assert isinstance(data, unicode), 'frame is not unicode'
+    assert isinstance(data, text_type), 'frame is not unicode'
 
     if not data.startswith(FRAME_SEPARATOR):
         return [data]

@@ -25,6 +25,7 @@ import logging
 from inspect import ismethod, getmembers
 
 from tornadio2 import proto
+from tornadio2.py2compat import with_metaclass
 
 
 logger = logging.getLogger('tornadio2.conn')
@@ -70,7 +71,7 @@ class EventMagicMeta(type):
         super(EventMagicMeta, cls).__init__(name, bases, attrs)
 
 
-class SocketConnection(object):
+class SocketConnection(with_metaclass(EventMagicMeta, object)):
     """Subclass this class and define at least `on_message()` method to make a Socket.IO
     connection handler.
 
@@ -96,8 +97,6 @@ class SocketConnection(object):
         sock.emit('test', {msg:'Hello World'});
 
     """
-    __metaclass__ = EventMagicMeta
-
     __endpoints__ = dict()
 
     def __init__(self, session, endpoint=None):
