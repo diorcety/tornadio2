@@ -63,7 +63,7 @@ class EventMagicMeta(type):
     """Event handler metaclass"""
     def __init__(cls, name, bases, attrs):
         # find events, also in bases
-        is_event = lambda x: ismethod(x) and hasattr(x, '_event_name')
+        is_event = lambda x: hasattr(x, '_event_name')
         events = [(e._event_name, e) for _, e in getmembers(cls, is_event)]
         setattr(cls, '_events', dict(events))
 
